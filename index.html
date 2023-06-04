@@ -1,0 +1,89 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script type="module" src="./css/tailwind.css"></script>
+  </head>
+  <body class="bg-gray-300">
+    <div class="grid lg:grid-cols-2 2xl:grid-cols-4 bg-gray-100">
+      <div
+        class="px-8 py-12 max-w-md mx-auto sm:max-w-xl lg:px-12 lg:py-24 lg:max-w-full xl:mr-0 2xl:col-span-2"
+      >
+        <div class="xl:max-w-xl">
+          <img
+            class="rounded-full w-40 h-40 mx-auto mb-4"
+            src="https://avatars.githubusercontent.com/u/49249262"
+            alt="My Github profile picture"
+          />
+          <h1
+            class="mt-6 text-2xl font-bold text-gray-900 sm:mt-8 sm:text-4xl lg:text-3xl xl:text-4xl">Hector Baez
+            <br class="lg:inline" />
+            <span class="text-red-400">My Digital (coding) NoteBook.</span>
+          </h1>
+          <p class="mt-2 text-gray-600 sm:mt-4 sm:text-xl">
+            This is a place for me to document my ongoing projects. Its main purpose is to serve as a reference for myself when I inevitably forget how I implemented something, and to share with others who might find this useful.
+          </p>
+          <div class="flex mt-4 space-x-2 sm:mt-6">
+            <a href="https://github.com/hector-baez" class="flex-wrap items-center">
+              <img src="img/github-logo.svg" alt="GitHub Logo" class="h-7 w-7">
+            </a>
+            <a href="https://www.linkedin.com/in/baezh" class="flex-wrap items-center">
+              <img src="img/linkedin-logo.svg" alt="GitHub Logo" class="h-7 w-7">
+            </a>
+            <!-- <a
+              class="btn btn-primary shadow-lg transform transition hover:-translate-y-0.5"
+              href="#"
+              >Book your escape</a
+            >
+            <a class="btn btn-secondary" href="#">Learn more</a> -->
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden relative lg:block 2xl:col-span-2">
+
+        <div class="grid 2xl:grid-cols-2 bg-gray-100">
+
+          <!-- Card content for the first card -->
+          <div className="hidden relative 2xl:block">
+            <div class="px-2 py-12">
+              <div class="max-w-md mx-auto bg-white rounded shadow-lg lg:block 2xl:col-span-2">
+                <img src="posts/ben/Big-Ben.jpg" alt="Big Ben clock" class="w-full h-48 object-cover object-center rounded-t">
+                <div class="px-6 py-4">
+                  <div class="font-bold text-xl mb-2">Ben: An Easy to Implement Job Scheduler</div>
+                  <p class="text-gray-700 text-base">For most researchers, access to a high compute cluster (HPC) means access to a ready to use...</p>
+                </div>
+                <div class="px-6 pt-4 pb-2">
+                  <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#HPC</span>
+                  <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#tag2</span>
+                  <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">#tag3</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- Card content for the second card -->
+        <div className="hidden relative 2xl:block">
+          <div class="px-2 py-12">
+            <div class="space-x-2 max-w-md mx-auto bg-white rounded shadow-lg lg:block 2xl:col-span-2">
+              <img src="posts/grafana/grafana-dashboard.png" alt="Grafana dashboard" class="w-full h-48 object-cover object-center rounded-t">
+              <div class="px-6 py-4">
+                <div class="font-bold text-xl mb-2">Server Monitoring and Viz with Grafana</div>
+                <p class="text-gray-700 text-base">Grafana is an open source software for collecting and analyzing metrics that programs churn out.</p>
+              </div>
+              <div class="px-6 pt-4 pb-2">
+                <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#tag1</span>
+                <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#tag2</span>
+                <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">#tag3</span>
+              </div>
+            </div>
+  
+  
+          </div>
+        </div>
+
+        </div>
+
+    </div>
+  </body>
+</html>
