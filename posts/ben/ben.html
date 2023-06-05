@@ -39,19 +39,19 @@
   
       <p class="my-6">First, we need to set up a virtual machine on JS2 that will act as our main server that will host the scheduler queue and logs. It does not need to be powerful - I use a 2 CPU core machine as my Ben server. Once that is done, we can download the latest Ben binary from their <a href="https://www.poirrier.ca/ben/" class="link-style">website</a> or run the following commands:</p>
       
-      <pre class="whitespace-pre-wrap">
+      <pre class="whitespace-pre-wrap bg-gray-600">
         <code class="language-bash">wget https://www.poirrier.ca/ben/ben-2.12.tar.gz; 
         tar -xf ben-2.12.tar.gz;</code></pre>
 
       <p class="my-4">To compile the binary, you will need to install pandoc and then run make.</p>
-      <pre class="whitespace-pre-wrap">
+      <pre class="whitespace-pre-wrap bg-gray-600">
         <code class="language-bash">sudo apt install -y pandoc;
         cd ben; make;</code></pre>
 
       <p class="my-4">Then, add Ben to your path. Since we are using JS2, we can move the ben binary file <code class="code-block">./ben/ben</code> to <code class="code-block">/usr/local/bin</code>.</p>
 
       <p class="my-4">To start a Ben job scheduler is straightforward:</p>
-      <pre class="whitespace-pre-wrap">
+      <pre class="whitespace-pre-wrap bg-gray-600">
         <code class="language-bash">ben server -d -s /tmp/ben-choose-a-name;</code></pre>
 
       <p class="my-4"><code class="code-block">-d: starts the server in the background</code><br><code class="code-block">-s: specifies the ben socket file. I keep several ben servers running in the same machine and use this option to give each server a unique name.</code></p>
@@ -60,7 +60,7 @@
 
       <p class="my-4">To make everything run smoothly, we will create an alias for each of the machines we just created to our ssh config file in the main JS2 machine:
         <br><br>
-        <pre class="whitespace-pre-wrap">
+        <pre class="whitespace-pre-wrap bg-gray-600">
             <code class="language-bash">
         echo "Host $NAME" >> $CLIENT_CONFIG
         echo "HostName $IP_ADDRESS" >> $CLIENT_CONFIG
@@ -79,12 +79,12 @@
 
       <p class="my-8">To add each machine we created as a client to the ben server, we first need to setup ben in each of those machines just how we did in the main machine. To make this easier, we will install parallel-ssh:</p>
 
-      <pre class="whitespace-pre-wrap">
+      <pre class="whitespace-pre-wrap bg-gray-600">
       <code class="language-bash">sudo apt install pssh;</code></pre>
 
-      <p class="my-4">Now, we can write a simple script to install ben:</p>
+      <p class="my-4">Now, we can write a simple bash script to install ben:</p>
 
-      <pre class="whitespace-pre-wrap">
+      <pre class="whitespace-pre-wrap bg-gray-600">
         <code class="language-bash">
     parallel-ssh -i -t 0 -h $HOSTNAME "sudo apt install pandoc -y"
     parallel-ssh -i -t 0 -h $HOSTNAME "wget https://www.poirrier.ca/ben/ben-$BEN_VERSION.tar.gz"
@@ -96,7 +96,7 @@
 
       <p class="my-4">Now, we can finally add the JS2 machines as clients:</p>
 
-      <pre class="whitespace-pre-wrap">
+      <pre class="whitespace-pre-wrap bg-gray-600">
     <code class="language-bash">ben client -r $NAME -n $NODES --remote-path $REMOTE_PATH -s $BEN_SERVER -d</code></pre>
       
       <p class="my-4"><code class="code-block">$NAME: name of JS2 machine as used in the ssh config file.<br>$NODES: maximum number of jobs to be run simultaneously by this machine.<br>$REMOTE_PATH: path to ben binary in the JS2 machine. In our case it is /usr/local/bin/ben<br>$BEN_SERVER: name of the ben server we are adding this client to. It should be what you chose for /tmp/ben-choose-a-name</code></p>
@@ -105,7 +105,7 @@
 
       <p class="my-4">To start adding jobs to the scheduler:</p>
 
-      <pre class="whitespace-pre-wrap">
+      <pre class="whitespace-pre-wrap bg-gray-600">
     <code class="language-bash">ben add -s $BENSERVER -c "/path/to/script.sh" $job -o $OUTPUT</code></pre>
 
       <p class="my-4"><code class="code-block">-s: path to ben server socket file.<br>-c: command you want to run in the client machine.<br>-o: path to folder in main machine where ben will write the job logs to.<br>$job: name of ben job. It's not necessary to be unique but it will overwrite log files with the same job name.</code></p>
