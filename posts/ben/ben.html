@@ -1,0 +1,123 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script type="module" src="../../css/tailwind.css"></script>
+    <link rel="stylesheet" href="../../node_modules/prismjs/themes/prism.css">
+    <link rel="stylesheet" href="../../node_modules/prismjs/themes/prism-tomorrow.css">
+
+    <title>Ben Job Scheduler</title>
+    <style>
+        .image-container {
+          max-width: 1000px;
+        }
+      </style>
+  </head>
+  <body>
+    <div class="w-screen">
+        <div class="image-container mx-auto">
+          <img src="Big-Ben.jpg" alt="Image" class="h-96 w-full object-cover object-center">
+        </div>
+      </div>
+  
+    <div class="max-w-3xl mx-auto px-4 py-8">
+      <h1 class="text-4xl font-bold mb-2">Ben: An Easy to Implement Job Scheduler</h1>
+      <p class="text-gray-600 mb-1">June 4, 2023</p>
+      <p class="text-gray-600">Hector Baez</p>
+      
+      <p class="my-4">In 2020, a new high compute cluster (HPC) called Jetstream2 opened up aimed at research use cases. For most researchers, access to a HPC means access to a ready to use job scheduler like CRON. Unlike traditional HPC clusters, Jetstream2 operates more like AWS cloud computing, offering researchers the flexibility to start virtual machines with different CPU and RAM configurations. This makes it easy to spin up multiple machines, but it presents the challenge of efficiently distributing job workloads across them.</p>
+      <p class="my-4">To address this, I started using Ben, a lightweight job scheduler that streamlines the distribution of workload across multiple machines. With Ben, researchers can manage and optimize their job scheduling on the Jetstream2 cluster, allowing them to utilize the compute resources more efficiently.</p>
+      <h2>Ben Setup</h2>
+      <style>
+        h2 {
+          font-weight: bold;
+          font-size: 24px;
+        }
+      </style>
+      <p class="my-4">To get started with Ben on JS2, follow these instructions to setup and implement the scheduler. </p>
+  
+      <p class="my-6">First, we need to set up a virtual machine on JS2 that will act as our main server that will host the scheduler queue and logs. It does not need to be powerful - I use a 2 CPU core machine as my Ben server. Once that is done, we can download the latest Ben binary from their <a href="https://www.poirrier.ca/ben/" class="link-style">website</a> or run the following commands:</p>
+      
+      <pre class="whitespace-pre-wrap">
+        <code class="language-bash">wget https://www.poirrier.ca/ben/ben-2.12.tar.gz; 
+        tar -xf ben-2.12.tar.gz;</code></pre>
+
+      <p class="my-4">To compile the binary, you will need to install pandoc and then run make.</p>
+      <pre class="whitespace-pre-wrap">
+        <code class="language-bash">sudo apt install -y pandoc;
+        cd ben; make;</code></pre>
+
+      <p class="my-4">Then, add Ben to your path. Since we are using JS2, we can move the ben binary file <code class="code-block">./ben/ben</code> to <code class="code-block">/usr/local/bin</code>.</p>
+
+      <p class="my-4">To start a Ben job scheduler is straightforward:</p>
+      <pre class="whitespace-pre-wrap">
+        <code class="language-bash">ben server -d -s /tmp/ben-choose-a-name;</code></pre>
+
+      <p class="my-4"><code class="code-block">-d: starts the server in the background</code><br><code class="code-block">-s: specifies the ben socket file. I keep several ben servers running in the same machine and use this option to give each server a unique name.</code></p>
+
+      <p class="my-4">Now that we have a ben server running, we should start up the JS2 machines we will be using to run jobs on. I won't go over this process, but I have written a script for my own use <a href="https://github.com/CALeDNA/crux/blob/master/crux/main_vm/setup_instance.sh" class="link-style">here</a> written in Bash using Openstack.</p>
+
+      <p class="my-4">To make everything run smoothly, we will create an alias for each of the machines we just created to our ssh config file in the main JS2 machine:
+        <br><br>
+        <pre class="whitespace-pre-wrap">
+            <code class="language-bash">
+        echo "Host $NAME" >> $CLIENT_CONFIG
+        echo "HostName $IP_ADDRESS" >> $CLIENT_CONFIG
+        echo "User $USER" >> $CLIENT_CONFIG
+        echo "PubKeyAuthentication yes" >> $CLIENT_CONFIG
+        echo "IdentityFile $PKEY" >> $CLIENT_CONFIG
+        echo "IdentitiesOnly yes" >> $CLIENT_CONFIG
+        echo "StrictHostKeyChecking accept-new" >> $CLIENT_CONFIG
+        echo "" >> $CLIENT_CONFIG
+            </code></pre>
+      </p>
+
+      <p class="my-4"><code class="code-block">$CLIENT_CONFIG: path to the ssh config file (~/.ssh/config).<br>$NAME: name of the JS2 machine.<br>$IP_ADDRESS: IP Adress of $NAME.<br>$USER: user that will be used in the ssh login. The JS2 default user is "ubuntu".<br>$PKEY: path to private key of the $NAME machine. This file should be place in ~/.ssh</code></p>
+
+      <p class="my-4">Note: make sure the ssh folder has the correct permissions.  <code>~/.ssh</code>  should have 700 permission and everything inside  <code>~/.ssh/*</code>  should have 600 permissions.</p>
+
+      <p class="my-8">To add each machine we created as a client to the ben server, we first need to setup ben in each of those machines just how we did in the main machine. To make this easier, we will install parallel-ssh:</p>
+
+      <pre class="whitespace-pre-wrap">
+      <code class="language-bash">sudo apt install pssh;</code></pre>
+
+      <p class="my-4">Now, we can write a simple script to install ben:</p>
+
+      <pre class="whitespace-pre-wrap">
+        <code class="language-bash">
+    parallel-ssh -i -t 0 -h $HOSTNAME "sudo apt install pandoc -y"
+    parallel-ssh -i -t 0 -h $HOSTNAME "wget https://www.poirrier.ca/ben/ben-$BEN_VERSION.tar.gz"
+    parallel-ssh -i -t 0 -h $HOSTNAME "tar -xf ben-$BEN_VERSION.tar.gz"
+    parallel-ssh -i -t 0 -h $HOSTNAME "cd ben && make  && sudo mv ben /usr/local/bin"
+        </code></pre>
+
+      <p class="my-4"><code class="code-block">$HOSTNAME: path to a text file with each line being the $NAME of each of the JS2 machines in the ssh config file.<br>$BEN_VERSION: In my case, 2.12</code></p>
+
+      <p class="my-4">Now, we can finally add the JS2 machines as clients:</p>
+
+      <pre class="whitespace-pre-wrap">
+    <code class="language-bash">ben client -r $NAME -n $NODES --remote-path $REMOTE_PATH -s $BEN_SERVER -d</code></pre>
+      
+      <p class="my-4"><code class="code-block">$NAME: name of JS2 machine as used in the ssh config file.<br>$NODES: maximum number of jobs to be run simultaneously by this machine.<br>$REMOTE_PATH: path to ben binary in the JS2 machine. In our case it is /usr/local/bin/ben<br>$BEN_SERVER: name of the ben server we are adding this client to. It should be what you chose for /tmp/ben-choose-a-name</code></p>
+
+      <p class="my-6">You should be able to run  <code class="code-block">ben nodes -s /tmp/$BEN_SERVER</code> and see the client machines you added.</p>
+
+      <p class="my-4">To start adding jobs to the scheduler:</p>
+
+      <pre class="whitespace-pre-wrap">
+    <code class="language-bash">ben add -s $BENSERVER -c "/path/to/script.sh" $job -o $OUTPUT</code></pre>
+
+      <p class="my-4"><code class="code-block">-s: path to ben server socket file.<br>-c: command you want to run in the client machine.<br>-o: path to folder in main machine where ben will write the job logs to.<br>$job: name of ben job. It's not necessary to be unique but it will overwrite log files with the same job name.</code></p>
+
+      <p class="my-6">To check the status of jobs added, run: <code class="code-block">ben list -s /tmp/$BEN_SERVER</code></p>
+
+      <p class="my-4">In addition to this introductory setup of Ben, the tool offers advanced features that enhance its job scheduling capabilities. In my own <a href="https://github.com/CALeDNA/crux/blob/707ca67c9e24a92445fbdbfb775e2ed94391f2f0/tronko/run_ac.sh#L74" class="link-style">setup</a>, I leverage Ben to seamlessly add jobs from a client machine to the job queue. Despite its lightweight nature, it is versatile and accommodates diverse scheduling requirements, making it a reliable choice for job scheduling needs. </p>
+      <!-- Continue adding more text and code snippets as needed -->
+    </div>
+    <script src="../../node_modules/prismjs/prism.js"></script>
+    <script>
+        Prism.highlightAll();
+      </script>
+  </body>
+</html>

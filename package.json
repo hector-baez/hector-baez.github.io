@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "vite": "^4.3.9"
   },
   "dependencies": {
+    "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }

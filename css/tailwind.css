@@ -13,3 +13,14 @@
       @apply bg-gray-300 text-gray-800 hover:bg-gray-200 focus:ring-gray-300 focus:ring-opacity-50 active:bg-gray-400;
     }
   }
+  .link-style {
+    color: blue; /* Change the color as desired */
+    text-decoration: underline; /* Add underline style */
+    /* Add any additional styles you want */
+  }
+  .code-block {
+    background-color: #f1f1f1;
+    font-family: Consolas, monospace;
+    padding: 2px 4px;
+    /* Add any additional styles you want */
+  }
