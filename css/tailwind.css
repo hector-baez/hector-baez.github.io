@@ -16,6 +16,6 @@
       @apply text-red-400 underline
     }
     .code-block {
-      @apply bg-gray-100 p-2
+      @apply bg-gray-200 p-2
     }
   }
