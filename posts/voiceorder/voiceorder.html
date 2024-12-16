@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automating To-Go Orders with AI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="w-screen">
+        <div class="image-container mx-auto">
+          <img src="Realtime-API.jpg" alt="Image" class="h-96 w-full object-cover object-center">
+        </div>
+      </div>
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-4">Automating To-Go Orders with OpenAI's Realtime API</h1>
+        <p class="text-gray-600">December 2024 | Hector Baez</p>
+
+        <p class="mt-6">For my family’s restaurant, Taqueria Baez, peak times often mean a flood of to-go orders and missed phone calls. It's hectic, and that's when I'm called in. As a programmer, I kept thinking it's time to automate this process.</p>
+
+        <p class="mt-4">This post details my first trial at automating this process using OpenAI’s Realtime API and Twilio. My goal was to create an Voice AI system that could handle incoming calls, take orders, and send them to our POS system.</p>
+
+        <h2 class="text-2xl font-bold mt-8">A Call Bot for Restaurants</h2>
+        <p class="mt-4">I wanted to automate what I spent hours doing during peak hours: answering calls. The goal was to have an AI assistant:</p>
+        <ul class="list-disc ml-6 mt-2">
+            <li>Answer the phone.</li>
+            <li>Provide accurate menu information.</li>
+            <li>Take to-go orders efficiently.</li>
+            <li>Speak both Spanish and English fluently, switching languages as needed.</li>
+            <li>Integrate with existing POS systems to process the order.</li>
+        </ul>
+
+        <p class="mt-4">Instead of focusing on training a custom AI model, I waited until OpenAI's Realtime API was available. Why reinvent the wheel when there's a large company continuously improving their language models? It also eliminated the complexity of this project.</p>
+
+        <p class="mt-4">The restaurant software industry is competitive. Companies like Bland.ai and OrderAI already offer solutions to this problem, but they rely on what appears to be in-house models and often lack multilingual support. OpenAI’s Realtime API supports multiple languages out of the box and is able to handle interruptions gracefully. Basically, any feature I liked in ChatGPT's Voice mode was available in their API.</p>
+
+        <h2 class="text-2xl font-bold mt-8">Code Prototype</h2>
+        <p class="mt-4">I built the bot on top of Twilio's demo code for capturing live audio with the Realtime API. Here are some insights into the implementation:</p>
+
+        <h3 class="text-xl font-semibold mt-6">1. Language Detection and Switching</h3>
+        <p class="mt-2">The goal was to have the bot detect what language the customer was speaking and respond in the same language. This requires only prompting the AI, as the Realtime API takes in an audio stream and automatically detects the language and transcribes it. The issue however is that the bot sometimes listens to the system's message and other times ignores it. When testing this, I would start off speaking Spanish and the bot followed suit. Then, I would switch to English and the bot understood me, but would respond in Spanish. This is currently still an open issue. I've had luck with certain system prompts, but it seems tiny changes to the system prompt have a big impact on the bots behavior.</p> 
+
+        <h3 class="text-xl font-semibold mt-6">2. Interrupt Handling</h3>
+        <p class="mt-2">One big issue with the bot was its wordy or wrong responses. I wanted to make sure the bot would stop speaking and listen when a customer interrupted. To do this, I added a <code>speech_started</code> event to the Twilio API. When the event was detected, I sent a <code>response.cancel</code> message to OpenAI, truncating the bot's audio and clearing the buffer to prioritize the customer's input.</p>
+
+        <pre class="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto mt-4">
+<code>if response.get('type') == 'input_audio_buffer.speech_started':
+    print("User started speaking. Interrupting AI response...")
+    clear_twilio = {"streamSid": stream_sid, "event": "clear"}
+    await websocket.send_json(clear_twilio)
+
+    interrupt_message = {"type": "response.cancel"}
+    await openai_ws.send(json.dumps(interrupt_message))</code>
+        </pre>
+
+        <h3 class="text-xl font-semibold mt-6">3. POS Integration</h3>
+        <p class="mt-2">The next step for this project is integrating the bot with major POS systems to directly process orders. While this is still in progress, the groundwork—capturing order details accurately—is already functional and many POS systems support plugins</p>
+
+        <h2 class="text-2xl font-bold mt-8">Challenges and Opportunities</h2>
+        <ul class="list-disc ml-6 mt-2">
+            <li><strong>Multilingual Support is a Game-Changer:</strong> Many competing solutions focus on English-speaking customers. By prioritizing Spanish alongside English, the bot can better serve a diverse customer base.</li>
+            <li><strong>Stiff Competition:</strong> Companies like OrderAI have polished, end products with funding and industry backing. However, there’s room for innovation, especially in areas like multilingual support, affordability for small restaurants, and custom integrations.</li>
+            <li><strong>POS Integration:</strong>Restaurants will only look at solutions that can be adopted easily. This means supporting all major POS providers, which adds complexity but is crucial for adoption.</li>
+        </ul>
+
+        <p class="mt-4">This project started as a fun challenge to automate my limited job duties, but I see potential for scaling it into a product that can help small businesses. Next steps:</p>
+        <ul class="list-disc ml-6 mt-2">
+            <li>Refining the bot’s conversational abilities.</li>
+            <li>Implementing POS integration.</li>
+            <li>Money? How to earn it.</li>
+        </ul>
+
+        <h2 class="text-xl font-semibold mt-8">The Code</h2>
+        <p class="mt-4">The partial implementation is available on <a href="https://github.com/hector-baez/VoiceOrderBot" class="text-blue-500">GitHub</a>.</p>
+    </div>
+</body>
+</html>
