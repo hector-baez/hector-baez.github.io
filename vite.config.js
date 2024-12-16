@@ -6,7 +6,8 @@ module.exports = {
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        ben: resolve(__dirname, 'posts/ben/ben.html')
+        ben: resolve(__dirname, 'posts/ben/ben.html'),
+        voiceorder: resolve(__dirname, 'posts/voiceorder/voiceorder.html'),
       }
     }
   }
